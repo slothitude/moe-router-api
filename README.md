@@ -1,10 +1,13 @@
 # MoE Router API
 
-Intelligent Mixture of Experts (MoE) routing API that automatically selects the best Ollama model for each query based on query type, hardware capabilities, and performance benchmarks.
+Intelligent Mixture of Experts (MoE) routing API that automatically selects the best Ollama model for each query based on query type, hardware capabilities, and performance benchmarks. Features Pi Agent Boss for automated management and external API integration.
 
 ## Features
 
 - **Automatic Query Routing**: Classifies queries and routes to optimal model
+- **No API Timeouts**: Queries complete naturally based on Ollama's processing time
+- **Pi Agent Boss**: Automated model management and benchmarking system
+- **External API Integration**: Support for NVIDIA NIM, OpenAI, and other cloud models
 - **Model Pool Management**: Intelligent GPU/RAM caching with LRU eviction
 - **Circuit Breaker Pattern**: Automatic fallback on model failures
 - **Response Caching**: LRU cache for improved performance
@@ -83,6 +86,101 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 The API will be available at http://localhost:8000
 
 API documentation: http://localhost:8000/docs
+
+## No Timeout Configuration
+
+**Important**: This Router API has been configured with **NO API timeouts**. Queries will run as long as Ollama needs to complete them, naturally.
+
+### Why No Timeouts?
+
+- **Better cold load handling**: Models can take time to load from disk
+- **No premature failures**: Queries won't timeout at arbitrary limits
+- **Natural completion**: Only Ollama determines when a query finishes
+- **Tested**: Queries successfully complete in 3+ minutes when needed
+
+### Example
+
+```bash
+# This query will complete no matter how long it takes
+curl -X POST http://localhost:8000/api/v1/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Explain quantum computing in detail"}'
+```
+
+Previously would have timed out at 120s. Now completes naturally!
+
+## Pi Agent Boss
+
+Pi Agent Boss is an autonomous management system for the MOE Router stack.
+
+### Starting Pi Agent Boss
+
+```bash
+# ACTIVE mode - Auto-optimizing local assistant
+python scripts/start_pi_assistant.py
+```
+
+### Features
+
+- **Automatic Model Discovery**: Detects new Ollama models automatically
+- **Mandatory Testing**: Ensures all models pass critical benchmarks
+- **Auto-Optimization**: Updates routing based on performance data
+- **Pool Management**: Automatically loads/unloads models for optimization
+- **Disk Management**: Keeps Ollama models under 50GB with auto-cleanup
+- **Health Monitoring**: Continuous system health checks every 60s
+
+### Modes
+
+- **ACTIVE**: Auto-optimize routing without heavy benchmarking (default)
+- **BOSS**: Full control with mandatory benchmarks and optimization
+- **ADVISORY**: Makes recommendations, waits for approval
+- **PASSIVE**: Monitor only, no changes
+
+### Pi Agent Status
+
+```bash
+# Check Pi Agent status
+curl http://localhost:8000/api/v1/pi-agent/status
+
+# Get routing recommendations
+curl http://localhost:8000/api/v1/pi-agent/recommendations
+```
+
+## External API Integration
+
+The Router API supports external cloud models alongside local Ollama models.
+
+### Configuration
+
+Edit `config/external_apis.yaml`:
+
+```yaml
+external_apis:
+  nvidia_nim:
+    enabled: true
+    base_url: "https://integrate.api.nvidia.com/v1"
+    api_key_env: "NVIDIA_API_KEY"
+    models:
+      - name: "meta/llama-3.1-405b-instruct"
+        display_name: "Llama 3.1 405B (NVIDIA)"
+        categories: ["factual", "document"]
+        priority: 90
+```
+
+### Environment Variables
+
+```bash
+# Set your API keys
+export NVIDIA_API_KEY="your-nvidia-api-key"
+export OPENAI_API_KEY="your-openai-api-key"
+```
+
+### Benefits
+
+- **Hybrid Routing**: Mix local and cloud models intelligently
+- **Benchmarking**: Compare local vs external model performance
+- **Fallback Chains**: Use external models when local models are busy
+- **Cost Optimization**: Prefer local models, use cloud for complex queries
 
 ## API Endpoints
 
@@ -236,7 +334,18 @@ python scripts/benchmark_models.py
 
 ## Performance
 
-Based on benchmark data:
+### Actual Test Results
+
+| Query Type | Query | Model | Time | Result |
+|------------|-------|-------|------|--------|
+| speed_critical | "What is 2+2?" | qwen3:4b | 216s | ✅ "4" |
+| code | "fibonacci function" | qwen2.5-coder | 109s | ✅ Working code |
+| factual | "capital of France" | qwen3:4b | 321s | ✅ "Paris" (cached) |
+| factual | "capital of Germany" | qwen3:4b | 180s | ✅ "Berlin" |
+
+**No Timeout Configuration**: Queries complete naturally based on Ollama processing time.
+
+### Expected Performance (Cached)
 
 | Query Type | Model | Expected Time |
 |------------|-------|---------------|
@@ -246,8 +355,11 @@ Based on benchmark data:
 | General chat | llama3.1 | ~18-22s |
 | Cache hit | N/A | <100ms |
 
-Concurrent capacity: ~15 simultaneous queries
-Effective capacity (with caching): ~30+ queries/minute
+### Capacity
+
+- **Concurrent**: ~15 simultaneous queries
+- **Effective (with caching)**: ~30+ queries/minute
+- **No timeout limit**: Queries can run as long as needed
 
 ## Hardware Optimization
 
@@ -279,6 +391,41 @@ ollama pull qwen3:4b
 
 ### Out of memory
 Reduce `gpu_capacity_mb` and `ram_capacity_mb` in `config.yaml`
+
+### Queries taking a long time
+This is **expected behavior** - the Router API has no timeout limits. Queries will complete based on Ollama's processing time, which can be several minutes for:
+- Cold model loads (first time using a model)
+- Complex queries requiring large models
+- External API calls
+
+**Do not interrupt** - let the query complete naturally.
+
+### Pi Agent Boss not discovering models
+```bash
+# Check Pi Agent status
+curl http://localhost:8000/api/v1/pi-agent/status
+
+# Verify Ollama is accessible
+curl http://localhost:11434/api/tags
+
+# Restart Pi Agent Boss
+python scripts/start_pi_assistant.py
+```
+
+### External API not working
+```bash
+# Verify API key is set
+echo $NVIDIA_API_KEY
+
+# Check external API configuration
+cat config/external_apis.yaml
+
+# Test external API directly
+curl -X POST https://integrate.api.nvidia.com/v1/chat/completions \
+  -H "Authorization: Bearer $NVIDIA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "meta/llama-3.1-405b-instruct", "messages": [{"role": "user", "content": "Hello"}]}'
+```
 
 ## Deployment
 
