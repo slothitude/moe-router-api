@@ -43,7 +43,7 @@ class QueryExecutor:
         model_pool: ModelPool,
         cache: ResponseCache,
         fallback_manager: FallbackManager,
-        default_timeout: float = 120.0,  # Increased from 30s for benchmarks
+        default_timeout: Optional[float] = None,  # No timeout - let queries complete
         model_limits: Optional[Dict[str, int]] = None,
         external_api_client: Optional['ExternalAPIClient'] = None
     ):
@@ -132,67 +132,50 @@ class QueryExecutor:
                     from_cache=True
                 )
 
-        # Attempt execution with fallback
-        timeout = timeout or self.default_timeout
+        # Attempt execution without timeout or fallback
         start_time = time.time()
-        attempt = 0
-        last_error = None
 
-        while attempt < 3:  # Max 3 attempts
-            try:
-                # Check if model can be attempted
-                if not await self.fallback_manager.can_attempt(model):
-                    logger.warning(f"Circuit open for {model}, skipping to next attempt")
-                    attempt += 1
-                    continue
-
-                # Execute with semaphore and timeout
+        try:
+            # Execute with semaphore (no timeout)
+            if timeout is None:
+                # No timeout - let query complete naturally
+                result = await self._execute_with_semaphore(query, model, options, system)
+            else:
+                # Use timeout if specified
                 result = await asyncio.wait_for(
                     self._execute_with_semaphore(query, model, options, system),
                     timeout=timeout
                 )
 
-                # Record success
-                await self.fallback_manager.record_success(model)
+            # Record success
+            await self.fallback_manager.record_success(model)
 
-                processing_time = time.time() - start_time
+            processing_time = time.time() - start_time
 
-                # Cache the result
-                await self.cache.set(
-                    query, model,
-                    {
-                        "response": result["response"],
-                        "tokens_generated": result.get("eval_count", 0),
-                        "processing_time": processing_time
-                    },
-                    options
-                )
+            # Cache the result
+            await self.cache.set(
+                query, model,
+                {
+                    "response": result["response"],
+                    "tokens_generated": result.get("eval_count", 0),
+                    "processing_time": processing_time
+                },
+                options
+            )
 
-                return ExecutionResult(
-                    response=result["response"],
-                    model_used=model,
-                    tokens_generated=result.get("eval_count", 0),
-                    processing_time=processing_time,
-                    routing_attempted=attempt + 1
-                )
+            return ExecutionResult(
+                response=result["response"],
+                model_used=model,
+                tokens_generated=result.get("eval_count", 0),
+                processing_time=processing_time,
+                routing_attempted=1
+            )
 
-            except asyncio.TimeoutError:
-                last_error = f"Timeout after {timeout}s"
-                logger.warning(f"Query timed out for {model}: {last_error}")
-                await self.fallback_manager.record_failure(model)
-
-            except Exception as e:
-                last_error = str(e)
-                logger.error(f"Query failed for {model}: {last_error}")
-                await self.fallback_manager.record_failure(model)
-
-            attempt += 1
-
-        # All attempts failed
-        processing_time = time.time() - start_time
-        raise Exception(
-            f"Query failed after {attempt} attempts. Last error: {last_error}"
-        )
+        except Exception as e:
+            processing_time = time.time() - start_time
+            logger.error(f"Query failed for {model}: {str(e)}")
+            await self.fallback_manager.record_failure(model)
+            raise Exception(f"Query failed: {str(e)}")
 
     async def _execute_with_semaphore(
         self,
@@ -293,15 +276,24 @@ class QueryExecutor:
         timeout = timeout or self.default_timeout
 
         try:
-            result = await asyncio.wait_for(
-                self.external_api_client.query(
+            # Execute with or without timeout
+            if timeout is None:
+                result = await self.external_api_client.query(
                     model,
                     messages,
                     temperature=options.get("temperature", 0.7) if options else 0.7,
                     max_tokens=options.get("num_predict", 1024) if options else 1024
-                ),
-                timeout=timeout
-            )
+                )
+            else:
+                result = await asyncio.wait_for(
+                    self.external_api_client.query(
+                        model,
+                        messages,
+                        temperature=options.get("temperature", 0.7) if options else 0.7,
+                        max_tokens=options.get("num_predict", 1024) if options else 1024
+                    ),
+                    timeout=timeout
+                )
 
             processing_time = time.time() - start_time
 

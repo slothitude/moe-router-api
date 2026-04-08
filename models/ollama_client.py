@@ -11,13 +11,13 @@ logger = logging.getLogger(__name__)
 class OllamaClient:
     """Client for interacting with Ollama API."""
 
-    def __init__(self, base_url: str = "http://localhost:11434", timeout: float = 120.0):
+    def __init__(self, base_url: str = "http://localhost:11434", timeout: Optional[float] = None):
         """
         Initialize Ollama client.
 
         Args:
             base_url: Ollama API base URL
-            timeout: Request timeout in seconds
+            timeout: Request timeout in seconds (None for no timeout)
         """
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
@@ -27,7 +27,7 @@ class OllamaClient:
         """Async context manager entry."""
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
-            timeout=self.timeout
+            timeout=httpx.Timeout(timeout=self.timeout) if self.timeout is not None else None
         )
         return self
 
@@ -41,7 +41,7 @@ class OllamaClient:
         if self._client is None:
             self._client = httpx.AsyncClient(
                 base_url=self.base_url,
-                timeout=self.timeout
+                timeout=httpx.Timeout(timeout=self.timeout) if self.timeout is not None else None
             )
         return self._client
 
