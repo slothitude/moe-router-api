@@ -1,0 +1,18 @@
+category,completion_tokens,confidence,error,first_token_time_ms,generation_speed_tps,model,prompt_speed_tps,prompt_tokens,query_type_classified,response_text,subcategory,test_id,timeout,total_latency_ms,total_tokens,was_optimal
+agentic,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,planning,agentic_001,False,120275.78377723694,0,False
+agentic,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,reasoning,agentic_011,False,120274.78361129761,0,False
+agentic,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,tool_use,agentic_021,False,120273.70190620422,0,False
+document,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,writing,document_001,False,120274.78361129761,0,False
+document,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,editing,document_011,False,120274.27339553833,0,False
+document,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,summarization,document_019,False,296.59199714660645,0,False
+code,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,generation,code_001,False,300.66490173339844,0,False
+code,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,debugging,code_013,False,300.1549243927002,0,False
+code,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,optimization,code_023,False,300.1549243927002,0,False
+creative,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,story,creative_001,False,301.15389823913574,0,False
+creative,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,poetry,creative_009,False,11.579751968383789,0,False
+creative,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,dialogue,creative_014,False,14.552593231201172,0,False
+creative,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,content,creative_018,False,21.5914249420166,0,False
+factual,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,definition,factual_001,False,23.10776710510254,0,False
+factual,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,fact,factual_008,False,24.118900299072266,0,False
+factual,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,comparison,factual_016,False,19.598722457885742,0,False
+factual,0,0.0,"HTTP 500: {""detail"":""Query failed after 3 attempts. Last error: None""}",,0.0,gemma4:e4b,0.0,0,unknown,,answer,factual_021,False,13.593673706054688,0,False

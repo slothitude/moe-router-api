@@ -64,4 +64,7 @@ def setup_rate_limits(app, enabled: bool = True):
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+    # Add SlowAPI middleware
+    app.add_middleware(SlowAPIMiddleware)
+
     logger.info("Rate limiting enabled (default: 60 requests/minute)")

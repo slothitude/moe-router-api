@@ -1,0 +1,28 @@
+{
+  "timestamp": "20260408_184335",
+  "speed_matrix": {
+    "gemma4:e4b": {
+      "agentic": 0.28348278999328613,
+      "document": 0.19758343696594238,
+      "code": 0.0995936393737793,
+      "creative": 0.19879549741744995,
+      "factual": 0.13439762592315674
+    }
+  },
+  "accuracy_matrix": {
+    "gemma4:e4b": {
+      "agentic": 0.0,
+      "document": 0.0,
+      "code": 0.0,
+      "creative": 0.0,
+      "factual": 0.0
+    }
+  },
+  "recommendations": {
+    "agentic": "gemma4:e4b",
+    "document": "gemma4:e4b",
+    "factual": "gemma4:e4b",
+    "creative": "gemma4:e4b",
+    "code": "gemma4:e4b"
+  }
+}

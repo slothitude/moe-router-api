@@ -1,8 +1,11 @@
 """Model specifications and benchmark data for routing decisions."""
 
+import logging
 from enum import Enum
 from typing import Dict, List, Optional
 from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
 
 
 class QueryType(Enum):
@@ -88,6 +91,17 @@ class ModelRegistry:
             prefers_gpu=True,
             description="Specialized code model for programming tasks"
         ),
+        "gemma4:e4b": ModelSpec(
+            name="gemma4:e4b",
+            total_time_s=18.3,  # From benchmark
+            prompt_speed_tps=450,
+            gen_speed_tps=55,
+            strength="Fast factual responses, good generalist",
+            query_types=[QueryType.SPEED_CRITICAL, QueryType.BALANCED],
+            memory_mb=9608,
+            prefers_gpu=True,
+            description="8B parameter model, fast on simple queries"
+        ),
         "llama3.2": ModelSpec(
             name="llama3.2",
             total_time_s=21.7,
@@ -148,10 +162,10 @@ class ModelRegistry:
     # Fallback chains for each query type
     FALLBACK_CHAINS: Dict[QueryType, List[str]] = {
         QueryType.CODE: ["qwen2.5-coder", "qwen3:4b", "llama3.1"],
-        QueryType.SPEED_CRITICAL: ["qwen3:4b", "nemotron-3-nano:4b", "llama3.1"],
+        QueryType.SPEED_CRITICAL: ["qwen3:4b", "gemma4:e4b", "nemotron-3-nano:4b", "llama3.1"],
         QueryType.GENERATION_HEAVY: ["llama3.2", "phi3:mini", "llama3.1"],
         QueryType.PROMPT_HEAVY: ["ministral-3", "qwen3:4b", "nemotron-3-nano:4b"],
-        QueryType.BALANCED: ["llama3.1", "qwen3:4b", "llama3.2"],
+        QueryType.BALANCED: ["llama3.1", "qwen3:4b", "gemma4:e4b", "llama3.2"],
     }
 
     @classmethod
@@ -237,3 +251,45 @@ class ModelRegistry:
         """
         return sum(cls.MODELS.get(name, ModelSpec("", 0, 0, 0, "", [], 0)).memory_mb
                    for name in model_names if name in cls.MODELS)
+
+    @classmethod
+    def register_external_model(cls, model_id: str, config: dict):
+        """
+        Register an external API model in the registry.
+
+        Args:
+            model_id: External model ID (e.g., "external/nvidia_nim/model-name")
+            config: Model configuration dict with display_name, categories, specialization, priority
+        """
+        # Convert external categories to QueryTypes
+        category_map = {
+            "code": QueryType.CODE,
+            "factual": QueryType.BALANCED,
+            "document": QueryType.GENERATION_HEAVY,
+            "agentic": QueryType.BALANCED,
+            "creative": QueryType.GENERATION_HEAVY,
+            "speed": QueryType.SPEED_CRITICAL,
+            "general": QueryType.BALANCED
+        }
+
+        query_types = []
+        for cat in config.get("categories", ["general"]):
+            if cat.lower() in category_map:
+                query_types.append(category_map[cat.lower()])
+
+        if not query_types:
+            query_types = [QueryType.BALANCED]
+
+        cls.MODELS[model_id] = ModelSpec(
+            name=model_id,
+            total_time_s=2.5,  # Estimated for external APIs
+            prompt_speed_tps=50,
+            gen_speed_tps=30,
+            strength=config.get("specialization", "External API model"),
+            query_types=query_types,
+            memory_mb=0,  # External models don't use local memory
+            prefers_gpu=False,  # External models don't use local GPU
+            description=f"External model via {config.get('api', 'API')}: {config.get('display_name', model_id)}"
+        )
+
+        logger.info(f"✓ Registered external model: {config.get('display_name', model_id)}")

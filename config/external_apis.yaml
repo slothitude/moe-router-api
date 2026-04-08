@@ -1,0 +1,28 @@
+# External AI API Configuration for Pi Agent Boss
+# This config allows Pi Agent to connect to external model APIs for benchmarking
+# and testing the internal MOE router system.
+
+external_apis:
+  # NVIDIA NIM API - Llama 3.1 405B for comparison benchmarking
+  nvidia_nim:
+    enabled: true
+    base_url: "https://integrate.api.nvidia.com/v1"
+    api_key_env: "NVIDIA_API_KEY"
+    models:
+      - name: "meta/llama-3.1-405b-instruct"
+        display_name: "Llama 3.1 405B (NVIDIA)"
+        categories: ["factual", "document"]
+        specialization: "large-knowledge-model"
+        priority: 90  # Higher priority for complex factual queries
+
+  # Additional APIs can be added here for future expansion
+  # openai:
+  #   enabled: false
+  #   base_url: "https://api.openai.com/v1"
+  #   api_key_env: "OPENAI_API_KEY"
+  #   models:
+  #     - name: "gpt-4o"
+  #       display_name: "GPT-4o"
+  #       categories: ["agentic", "code"]
+  #       specialization: "complex-reasoning"
+  #       priority: 95

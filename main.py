@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 from models.ollama_client import OllamaClient
 from models.model_specs import ModelRegistry
 from models.query_classifier import QueryClassifier
+from models.external_api_client import ExternalAPIClient
 from core.model_pool import ModelPool
 from core.router import QueryRouter
 from core.executor import QueryExecutor
@@ -25,6 +26,7 @@ from api.routes.query import router as query_router
 from api.routes.models import router as models_router
 from api.routes.health import router as health_router
 from api.routes.websocket import router as websocket_router
+from api.routes.pi_agent import router as pi_agent_router
 from api.middleware.cors import add_cors_middleware
 from api.middleware.logging import RequestLoggingMiddleware
 from api.middleware.auth import APIKeyMiddleware
@@ -154,13 +156,24 @@ async def lifespan(app: FastAPI):
     )
     await app.state.cache.start()
 
+    # External API client (optional)
+    external_api_config = os.getenv("EXTERNAL_API_CONFIG")
+    app.state.external_api_client = None
+    if external_api_config:
+        try:
+            app.state.external_api_client = ExternalAPIClient(external_api_config)
+            logger.info(f"External API client initialized: {external_api_config}")
+        except Exception as e:
+            logger.warning(f"Failed to initialize external API client: {e}")
+
     # Query executor
     app.state.executor = QueryExecutor(
         ollama_client=app.state.ollama_client,
         model_pool=app.state.model_pool,
         cache=app.state.cache,
         fallback_manager=app.state.fallback_manager,
-        model_limits=config["concurrency"]["model_limits"]
+        model_limits=config["concurrency"]["model_limits"],
+        external_api_client=app.state.external_api_client
     )
 
     # Metrics collector
@@ -219,6 +232,14 @@ async def lifespan(app: FastAPI):
         except asyncio.TimeoutError:
             logger.warning("Ollama client did not close gracefully")
 
+    # Close external API client connections
+    if hasattr(app.state, 'external_api_client') and app.state.external_api_client:
+        logger.info("Closing external API client...")
+        try:
+            await app.state.external_api_client.close()
+        except Exception as e:
+            logger.warning(f"External API client cleanup error: {e}")
+
     # Final log
     logger.info("Shutdown complete. Goodbye!")
 
@@ -247,6 +268,7 @@ app.include_router(query_router)
 app.include_router(models_router)
 app.include_router(health_router)
 app.include_router(websocket_router)
+app.include_router(pi_agent_router)
 
 
 @app.get("/")

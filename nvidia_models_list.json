@@ -1,0 +1,74 @@
+[
+  {
+    "id": "meta/llama-3.1-405b-instruct",
+    "owner": "meta",
+    "description": "405B parameters - Largest Llama model, best for complex reasoning",
+    "recommended_for": ["factual", "complex-reasoning", "benchmarking"]
+  },
+  {
+    "id": "meta/llama-3.1-70b-instruct",
+    "owner": "meta",
+    "description": "70B parameters - Balance of size and performance",
+    "recommended_for": ["general", "factual", "code"]
+  },
+  {
+    "id": "meta/llama-3.2-3b-instruct",
+    "owner": "meta",
+    "description": "3B parameters - Fast and efficient",
+    "recommended_for": ["speed", "general"]
+  },
+  {
+    "id": "deepseek-ai/deepseek-v3.2",
+    "owner": "deepseek-ai",
+    "description": "Latest DeepSeek model - Strong reasoning",
+    "recommended_for": ["reasoning", "code", "math"]
+  },
+  {
+    "id": "deepseek-ai/deepseek-coder-6.7b-instruct",
+    "owner": "deepseek-ai",
+    "description": "6.7B code specialist",
+    "recommended_for": ["code", "programming"]
+  },
+  {
+    "id": "qwen/qwen3.5-397b-a17b",
+    "owner": "qwen",
+    "description": "397B parameters - Massive model from Qwen",
+    "recommended_for": ["factual", "reasoning", "chinese"]
+  },
+  {
+    "id": "qwen/qwen2.5-coder-32b-instruct",
+    "owner": "qwen",
+    "description": "32B code model",
+    "recommended_for": ["code", "programming"]
+  },
+  {
+    "id": "microsoft/phi-4-mini-instruct",
+    "owner": "microsoft",
+    "description": "Latest Phi-4 model - Efficient and capable",
+    "recommended_for": ["general", "speed", "reasoning"]
+  },
+  {
+    "id": "google/gemma-3-27b-it",
+    "owner": "google",
+    "description": "27B Gemma-3 model",
+    "recommended_for": ["general", "factual"]
+  },
+  {
+    "id": "mistralai/mistral-large-3-675b-instruct-2512",
+    "owner": "mistralai",
+    "description": "675B parameters - Massive Mistral model",
+    "recommended_for": ["complex-reasoning", "factual"]
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "owner": "nvidia",
+    "description": "70B NVIDIA-optimized Llama",
+    "recommended_for": ["general", "nvidia-optimized"]
+  },
+  {
+    "id": "nvidia/nemotron-4-340b-instruct",
+    "owner": "nvidia",
+    "description": "340B NVIDIA model",
+    "recommended_for": ["complex-reasoning", "enterprise"]
+  }
+]

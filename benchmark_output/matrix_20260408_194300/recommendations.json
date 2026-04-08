@@ -1,0 +1,18 @@
+{
+  "timestamp": "20260408_194300",
+  "summary": "Routing recommendations based on benchmark results",
+  "recommendations": {
+    "code": "gemma4:e4b",
+    "agentic": "gemma4:e4b",
+    "document": "gemma4:e4b",
+    "factual": "gemma4:e4b",
+    "creative": "gemma4:e4b"
+  },
+  "explanation": {
+    "agentic": "Multi-step reasoning and planning tasks",
+    "document": "Document writing, editing, and summarization",
+    "code": "Code generation, debugging, and optimization",
+    "creative": "Creative writing and content generation",
+    "factual": "Quick factual questions and definitions"
+  }
+}

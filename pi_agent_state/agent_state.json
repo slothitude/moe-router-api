@@ -1,0 +1,260 @@
+{
+  "models": {
+    "gemma4:e4b": {
+      "name": "gemma4:e4b",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 85.31200000000536
+    },
+    "llama3.1:latest": {
+      "name": "llama3.1:latest",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 44.828999999997905
+    },
+    "qwen2.5-coder:latest": {
+      "name": "qwen2.5-coder:latest",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 52.82799999999406
+    },
+    "nemotron-3-nano:4b": {
+      "name": "nemotron-3-nano:4b",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 59.01499999999942
+    },
+    "phi3:mini": {
+      "name": "phi3:mini",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 22.328000000008615
+    },
+    "nomic-embed-text:latest": {
+      "name": "nomic-embed-text:latest",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": null
+    },
+    "ministral-3:latest": {
+      "name": "ministral-3:latest",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 119.92200000000594
+    },
+    "qwen3:4b": {
+      "name": "qwen3:4b",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 85.34300000000803
+    },
+    "llama3.2:latest": {
+      "name": "llama3.2:latest",
+      "in_pool": false,
+      "loaded": false,
+      "location": null,
+      "memory_mb": 0,
+      "queries_handled": 0,
+      "avg_latency_ms": 0,
+      "success_rate": 1.0,
+      "last_health_check": null,
+      "benchmark_score": 0.0,
+      "routing_recommendations": [],
+      "disk_size_gb": 0.0,
+      "disk_path": null,
+      "last_used": null,
+      "removal_priority": 0,
+      "load_time": 115.79700000000594
+    }
+  },
+  "routing_recommendations": {},
+  "benchmark_results": {
+    "gemma4:e4b": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T18:19:55.998453"
+    },
+    "llama3.1:latest": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:39.410506"
+    },
+    "qwen2.5-coder:latest": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:42.975990"
+    },
+    "nemotron-3-nano:4b": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:46.472346"
+    },
+    "phi3:mini": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:50.770704"
+    },
+    "nomic-embed-text:latest": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:54.322581"
+    },
+    "ministral-3:latest": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:16:57.941890"
+    },
+    "qwen3:4b": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:17:01.422730"
+    },
+    "llama3.2:latest": {
+      "score": 0.0,
+      "categories_tested": [
+        "agentic",
+        "code",
+        "factual",
+        "document"
+      ],
+      "timestamp": "2026-04-08T19:17:04.943540"
+    }
+  },
+  "last_updated": "2026-04-08T23:24:28.752559"
+}

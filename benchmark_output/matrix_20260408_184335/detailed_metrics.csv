@@ -1,0 +1,18 @@
+category,completion_tokens,confidence,error,first_token_time_ms,generation_speed_tps,model,prompt_speed_tps,prompt_tokens,query_type_classified,response_text,subcategory,test_id,timeout,total_latency_ms,total_tokens,was_optimal
+agentic,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,planning,agentic_001,False,274.8076915740967,0,False
+agentic,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,reasoning,agentic_011,False,281.299352645874,0,False
+agentic,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,tool_use,agentic_021,False,294.3413257598877,0,False
+document,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,writing,document_001,False,301.9571304321289,0,False
+document,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,editing,document_011,False,286.8235111236572,0,False
+document,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,summarization,document_019,False,3.9696693420410156,0,False
+code,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,generation,code_001,False,271.0249423980713,0,False
+code,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,debugging,code_013,False,17.14301109313965,0,False
+code,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,optimization,code_023,False,10.612964630126953,0,False
+creative,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,story,creative_001,False,5.084753036499023,0,False
+creative,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,poetry,creative_009,False,264.35208320617676,0,False
+creative,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,dialogue,creative_014,False,256.8356990814209,0,False
+creative,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,content,creative_018,False,268.9094543457031,0,False
+factual,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,definition,factual_001,False,4.034519195556641,0,False
+factual,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,fact,factual_008,False,271.8639373779297,0,False
+factual,0,0.0,,,0.0,gemma4:e4b,0.0,0,unknown,,comparison,factual_016,False,2.997875213623047,0,False
+factual,0,0.0,"HTTP 500: {""error"":""Internal server error"",""detail"":""parameter `request` must be an instance of starlette.requests.Request""}",,0.0,gemma4:e4b,0.0,0,unknown,,answer,factual_021,False,258.6941719055176,0,False

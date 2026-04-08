@@ -43,8 +43,9 @@ class QueryExecutor:
         model_pool: ModelPool,
         cache: ResponseCache,
         fallback_manager: FallbackManager,
-        default_timeout: float = 30.0,
-        model_limits: Optional[Dict[str, int]] = None
+        default_timeout: float = 120.0,  # Increased from 30s for benchmarks
+        model_limits: Optional[Dict[str, int]] = None,
+        external_api_client: Optional['ExternalAPIClient'] = None
     ):
         """
         Initialize query executor.
@@ -54,14 +55,16 @@ class QueryExecutor:
             model_pool: Model pool instance
             cache: Response cache instance
             fallback_manager: Fallback manager instance
-            default_timeout: Default timeout in seconds
+            default_timeout: Default timeout in seconds (increased for benchmarks)
             model_limits: Concurrent request limit per model
+            external_api_client: Optional external API client for cloud models
         """
         self.ollama = ollama_client
         self.model_pool = model_pool
         self.cache = cache
         self.fallback_manager = fallback_manager
         self.default_timeout = default_timeout
+        self.external_api_client = external_api_client
 
         # Default model limits (based on benchmark speeds)
         self.model_limits = model_limits or {
@@ -112,7 +115,11 @@ class QueryExecutor:
         Returns:
             ExecutionResult with response and metadata
         """
-        # Check cache first
+        # Check if this is an external model
+        if model.startswith("external/") and self.external_api_client:
+            return await self._execute_external(query, model, options, timeout, use_cache)
+
+        # Check cache first for local models
         if use_cache:
             cached = await self.cache.get(query, model, options)
             if cached is not None:
@@ -240,6 +247,87 @@ class QueryExecutor:
                 if job_id in self.active_jobs[model]:
                     self.active_jobs[model].remove(job_id)
                 logger.debug(f"Released semaphore for {model}")
+
+    async def _execute_external(
+        self,
+        query: str,
+        model: str,
+        options: Optional[Dict[str, Any]],
+        timeout: Optional[float],
+        use_cache: bool
+    ) -> ExecutionResult:
+        """
+        Execute query on external API model.
+
+        Args:
+            query: Query string
+            model: External model ID
+            options: Generation options
+            timeout: Request timeout
+            use_cache: Whether to check cache
+
+        Returns:
+            ExecutionResult with response and metadata
+        """
+        if not self.external_api_client:
+            raise ValueError("External API client not configured")
+
+        # Check cache first
+        if use_cache:
+            cached = await self.cache.get(query, model, options)
+            if cached is not None:
+                logger.info(f"Cache hit for external model {model}")
+                return ExecutionResult(
+                    response=cached.get("response", ""),
+                    model_used=model,
+                    tokens_generated=cached.get("tokens_generated", 0),
+                    processing_time=cached.get("processing_time", 0.0),
+                    from_cache=True
+                )
+
+        # Prepare messages for external API
+        messages = [{"role": "user", "content": query}]
+
+        # Execute query
+        start_time = time.time()
+        timeout = timeout or self.default_timeout
+
+        try:
+            result = await asyncio.wait_for(
+                self.external_api_client.query(
+                    model,
+                    messages,
+                    temperature=options.get("temperature", 0.7) if options else 0.7,
+                    max_tokens=options.get("num_predict", 1024) if options else 1024
+                ),
+                timeout=timeout
+            )
+
+            processing_time = time.time() - start_time
+
+            # Cache the result
+            await self.cache.set(
+                query, model,
+                {
+                    "response": result["content"],
+                    "tokens_generated": result.get("usage", {}).get("completion_tokens", 0),
+                    "processing_time": processing_time
+                },
+                options
+            )
+
+            return ExecutionResult(
+                response=result["content"],
+                model_used=model,
+                tokens_generated=result.get("usage", {}).get("completion_tokens", 0),
+                processing_time=processing_time,
+                routing_attempted=1
+            )
+
+        except asyncio.TimeoutError:
+            raise Exception(f"External API timeout after {timeout}s")
+        except Exception as e:
+            raise Exception(f"External API error: {str(e)}")
 
     async def execute_stream(
         self,

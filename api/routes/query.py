@@ -10,7 +10,6 @@ from datetime import datetime
 from core.router import QueryRouter, RoutingDecision
 from core.executor import QueryExecutor, ExecutionResult
 from models.model_specs import QueryType
-from api.middleware.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +58,7 @@ async def get_router_executor() -> tuple[QueryRouter, QueryExecutor]:
 
 
 @router.post("/query", response_model=QueryResponse)
-@limiter.limit("30/minute")  # 30 queries per minute per client
-async def query_route(http_request: Request, request: QueryRequest):
+async def query_route(request: QueryRequest, http_request: Request):
     """
     Execute a single query with automatic routing.
 
@@ -72,6 +70,10 @@ async def query_route(http_request: Request, request: QueryRequest):
 
     Returns the response along with routing metadata.
     """
+    from main import app
+
+    # Note: Rate limiting disabled temporarily due to slowapi compatibility issues
+    # Can be re-enabled with a different rate limiting solution
     from main import app
 
     router: QueryRouter = app.state.router
@@ -150,7 +152,6 @@ async def query_route(http_request: Request, request: QueryRequest):
 
 
 @router.post("/query/stream")
-@limiter.limit("10/minute")  # 10 streaming requests per minute per client
 async def query_stream_route(http_request: Request, request: QueryRequest):
     """
     Execute a query with streaming response.
@@ -224,7 +225,6 @@ async def query_stream_route(http_request: Request, request: QueryRequest):
 
 
 @router.post("/batch", response_model=BatchResponse)
-@limiter.limit("10/minute")  # 10 batch requests per minute per client
 async def batch_route(http_request: Request, request: BatchRequest):
     """
     Execute multiple queries in batch.

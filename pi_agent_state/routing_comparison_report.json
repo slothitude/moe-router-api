@@ -1,0 +1,111 @@
+{
+  "timestamp": "2026-04-08T19:17:09.178704",
+  "auto_routing_results": {
+    "agentic": {
+      "score": 0.0,
+      "model_selection": {},
+      "avg_latency": 0.0,
+      "queries": 30
+    },
+    "code": {
+      "score": 0.0,
+      "model_selection": {},
+      "avg_latency": 0.0,
+      "queries": 30
+    },
+    "factual": {
+      "score": 0.0,
+      "model_selection": {},
+      "avg_latency": 0.0,
+      "queries": 25
+    },
+    "document": {
+      "score": 0.0,
+      "model_selection": {},
+      "avg_latency": 0.0,
+      "queries": 25
+    }
+  },
+  "model_benchmarks": {
+    "gemma4:e4b": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "llama3.1:latest": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "qwen2.5-coder:latest": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "nemotron-3-nano:4b": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "phi3:mini": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "nomic-embed-text:latest": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "ministral-3:latest": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "qwen3:4b": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    },
+    "llama3.2:latest": {
+      "score": 0.0,
+      "queries": 0,
+      "avg_latency": 0
+    }
+  },
+  "classification_accuracy": {
+    "overall": 0.0,
+    "by_category": {
+      "agentic": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "total": 5,
+        "model_usage": {}
+      },
+      "document": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "total": 5,
+        "model_usage": {}
+      },
+      "code": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "total": 5,
+        "model_usage": {}
+      },
+      "creative": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "total": 5,
+        "model_usage": {}
+      },
+      "factual": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "total": 5,
+        "model_usage": {}
+      }
+    }
+  }
+}
