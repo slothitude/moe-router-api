@@ -1,0 +1,41 @@
+server:
+  host: "0.0.0.0"
+  port: 8000
+  log_level: "info"
+
+models:
+  ollama_base_url: "http://localhost:11434"
+  pool:
+    gpu_capacity_mb: 3500
+    ram_capacity_mb: 20000
+  preload:
+    - "qwen3:4b"
+    - "qwen2.5-coder"
+    - "llama3.1"
+    - "ministral-3"
+
+routing:
+  enable_embeddings: true
+  embedding_model: "nomic-embed-text"
+  semantic_threshold: 0.85
+
+cache:
+  enabled: true
+  max_size: 1000
+  ttl_seconds: 3600
+
+concurrency:
+  default_limit: 3
+  model_limits:
+    qwen3:4b: 3
+    qwen2.5-coder: 3
+    llama3.2: 2
+    llama3.1: 4
+    ministral-3: 3
+    phi3:mini: 4
+    nemotron-3-nano:4b: 4
+
+fallback:
+  max_attempts: 3
+  circuit_breaker_threshold: 3
+  circuit_breaker_cooldown: 60
