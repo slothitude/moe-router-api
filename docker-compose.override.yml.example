@@ -1,0 +1,37 @@
+# Example docker-compose override file
+# Copy this file to docker-compose.override.yml and customize as needed
+
+version: '3.8'
+
+services:
+  moe-router:
+    # Uncomment to enable GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+    # Uncomment to expose different port
+    # ports:
+    #   - "8080:8000"
+
+    # Uncomment to use custom environment file
+    # env_file:
+    #   - .env.production
+
+  ollama:
+    # Uncomment to enable GPU support for Ollama
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+    # Uncomment to expose Ollama API
+    # ports:
+    #   - "11434:11434"

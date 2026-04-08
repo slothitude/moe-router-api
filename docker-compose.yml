@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # MoE Router API
+  moe-router:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: moe-router-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Ollama Configuration
+      - OLLAMA_BASE_URL=http://ollama:11434
+
+      # Server Configuration
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=info
+
+      # API Authentication (set your API keys here)
+      - API_KEYS=your-secret-api-key-1,your-secret-api-key-2
+
+      # Rate Limiting
+      - RATE_LIMIT_DISABLED=false
+
+      # Model Pool Configuration
+      - GPU_CAPACITY_MB=3500
+      - RAM_CAPACITY_MB=20000
+
+      # Cache Configuration
+      - CACHE_ENABLED=true
+      - CACHE_MAX_SIZE=1000
+      - CACHE_TTL_SECONDS=3600
+
+      # Concurrency Configuration
+      - DEFAULT_CONCURRENCY_LIMIT=3
+
+      # Fallback Configuration
+      - CIRCUIT_BREAKER_THRESHOLD=3
+      - CIRCUIT_BREAKER_COOLDOWN=60
+    depends_on:
+      - ollama
+    networks:
+      - moe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Ollama Service (optional - comment out if running Ollama separately)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - moe-network
+    restart: unless-stopped
+    # GPU support (uncomment if you have NVIDIA GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Prometheus (optional - for metrics monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - moe-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana (optional - for metrics visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - moe-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+networks:
+  moe-network:
+    driver: bridge
+
+volumes:
+  ollama-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local

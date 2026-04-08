@@ -4,6 +4,7 @@ import asyncio
 import logging
 import yaml
 import os
+import signal
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -26,6 +27,8 @@ from api.routes.health import router as health_router
 from api.routes.websocket import router as websocket_router
 from api.middleware.cors import add_cors_middleware
 from api.middleware.logging import RequestLoggingMiddleware
+from api.middleware.auth import APIKeyMiddleware
+from api.middleware.rate_limit import setup_rate_limits
 
 # Configure logging
 logging.basicConfig(
@@ -183,23 +186,41 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Shutting down MoE Router API...")
 
+    # Give in-flight requests time to complete (grace period)
+    logger.info("Waiting for in-flight requests to complete (10 second grace period)...")
+    await asyncio.sleep(10)
+
     # Stop background tasks
     if hasattr(app.state, 'health_check_task'):
+        logger.info("Stopping health check task...")
         app.state.health_check_task.cancel()
         try:
-            await app.state.health_check_task
-        except asyncio.CancelledError:
-            pass
+            await asyncio.wait_for(app.state.health_check_task, timeout=5.0)
+        except (asyncio.CancelledError, asyncio.TimeoutError):
+            logger.warning("Health check task did not stop gracefully")
 
-    # Stop cache
+    # Stop cache cleanup task
     if hasattr(app.state, 'cache'):
-        await app.state.cache.stop()
+        logger.info("Stopping cache cleanup task...")
+        try:
+            await asyncio.wait_for(app.state.cache.stop(), timeout=5.0)
+        except asyncio.TimeoutError:
+            logger.warning("Cache cleanup task did not stop gracefully")
 
-    # Close Ollama client
+    # Save any pending metrics (if implemented)
+    if hasattr(app.state, 'metrics'):
+        logger.info("Finalizing metrics...")
+
+    # Close Ollama client connections
     if hasattr(app.state, 'ollama_client'):
-        await app.state.ollama_client.__aexit__(None, None, None)
+        logger.info("Closing Ollama client...")
+        try:
+            await asyncio.wait_for(app.state.ollama_client.__aexit__(None, None, None), timeout=5.0)
+        except asyncio.TimeoutError:
+            logger.warning("Ollama client did not close gracefully")
 
-    logger.info("Shutdown complete")
+    # Final log
+    logger.info("Shutdown complete. Goodbye!")
 
 
 # Create FastAPI app
@@ -213,6 +234,13 @@ app = FastAPI(
 # Add middleware
 add_cors_middleware(app)
 app.add_middleware(RequestLoggingMiddleware)
+
+# Add rate limiting
+setup_rate_limits(app, enabled=True)
+
+# Add API key middleware (if API_KEYS env var is set)
+if os.getenv("API_KEYS"):
+    app.add_middleware(APIKeyMiddleware)
 
 # Include routers
 app.include_router(query_router)
@@ -263,10 +291,15 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", config["server"]["port"]))
     log_level = os.getenv("LOG_LEVEL", config["server"]["log_level"])
 
+    # Configure uvicorn with proper signal handling
     uvicorn.run(
         "main:app",
         host=host,
         port=port,
         log_level=log_level,
-        reload=True
+        reload=True,
+        # Graceful shutdown settings
+        timeout_graceful_shutdown=30,  # Wait 30s for graceful shutdown
+        limit_concurrency=100,  # Limit concurrent connections
+        timeout_keep_alive=5,  # Close idle connections after 5s
     )

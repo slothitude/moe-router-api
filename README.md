@@ -11,6 +11,10 @@ Intelligent Mixture of Experts (MoE) routing API that automatically selects the 
 - **Concurrency Control**: Semaphore-based throttling per model
 - **WebSocket Support**: Real-time streaming for chat sessions
 - **Health Monitoring**: System health checks and metrics
+- **API Key Authentication**: Secure API access with configurable keys
+- **Rate Limiting**: Prevent abuse with per-client rate limits
+- **Docker Support**: Containerized deployment with Docker & Docker Compose
+- **CI/CD Pipeline**: Automated testing and deployment with GitHub Actions
 
 ## Quick Start
 
@@ -275,6 +279,86 @@ ollama pull qwen3:4b
 
 ### Out of memory
 Reduce `gpu_capacity_mb` and `ram_capacity_mb` in `config.yaml`
+
+## Deployment
+
+### Docker Deployment
+
+Build and run with Docker:
+
+```bash
+# Build the image
+docker build -t moe-router-api .
+
+# Run the container
+docker run -p 8000:8000 \
+  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
+  -e API_KEYS=your-secret-key \
+  moe-router-api
+```
+
+### Docker Compose Deployment
+
+Start all services (API + Ollama + Monitoring):
+
+```bash
+# Start with monitoring (Prometheus + Grafana)
+docker-compose --profile monitoring up -d
+
+# Start without monitoring
+docker-compose up -d
+
+# View logs
+docker-compose logs -f moe-router
+
+# Stop all services
+docker-compose down
+```
+
+### Configuration
+
+Environment variables for deployment:
+
+```bash
+# API Authentication (required for production)
+API_KEYS=key1,key2,key3
+
+# Rate Limiting
+RATE_LIMIT_DISABLED=false
+
+# Ollama Connection
+OLLAMA_BASE_URL=http://ollama:11434
+```
+
+### Security Best Practices
+
+1. **Always set API keys** in production:
+   ```bash
+   export API_KEYS="your-secure-key-1,your-secure-key-2"
+   ```
+
+2. **Use HTTPS** in production with a reverse proxy (nginx/traefik)
+
+3. **Enable rate limiting** to prevent abuse:
+   ```bash
+   export RATE_LIMIT_DISABLED=false
+   ```
+
+4. **Monitor metrics** via Prometheus endpoint:
+   ```
+   http://your-server:8000/api/v1/metrics/prometheus
+   ```
+
+5. **Run behind a firewall** and restrict access to the API
+
+### Monitoring
+
+Access monitoring dashboards:
+
+- **API Health**: http://localhost:8000/api/v1/health
+- **Metrics**: http://localhost:8000/api/v1/metrics
+- **Prometheus**: http://localhost:9090 (with `--profile monitoring`)
+- **Grafana**: http://localhost:3000 (admin/admin, with `--profile monitoring`)
 
 ## License
 

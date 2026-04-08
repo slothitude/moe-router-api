@@ -258,17 +258,42 @@ class MetricsCollector:
         Returns:
             Dict with key metrics
         """
+        # Get cache metrics using _metrics dict
+        cache_hits_value = 0
+        cache_misses_value = 0
+
+        # Extract values from Prometheus metrics
+        for metric in [self.cache_hits, self.cache_misses]:
+            for sample in metric.collect()[0].samples:
+                if metric.name == "moe_cache_hits_total":
+                    cache_hits_value = sample.value or 0
+                elif metric.name == "moe_cache_misses_total":
+                    cache_misses_value = sample.value or 0
+
+        # Get total queries
+        total_queries = 0
+        try:
+            for metric in self.query_counter.collect():
+                for sample in metric.samples:
+                    total_queries += sample.value or 0
+        except Exception:
+            total_queries = 0
+
+        # Get active models
+        active_models = set()
+        try:
+            for metric in self.model_usage.collect():
+                for sample in metric.samples:
+                    if sample.name == "moe_model_usage_total":
+                        active_models.add(sample.labels.get('model', ''))
+        except Exception:
+            pass
+
         return {
-            "cache_hits": self.cache_hits._value.get(),
-            "cache_misses": self.cache_misses._value.get(),
-            "total_queries": sum(
-                counter._value.get()
-                for counter in self.query_counter._metrics.values()
-            ),
-            "active_models": len(set(
-                label.labels.get('model', '')
-                for label in self.model_usage._metrics.values()
-            )),
+            "cache_hits": int(cache_hits_value),
+            "cache_misses": int(cache_misses_value),
+            "total_queries": int(total_queries),
+            "active_models": len(active_models),
             "avg_query_times": {
                 model: self.get_avg_query_time(model)
                 for model in self._query_times.keys()

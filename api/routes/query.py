@@ -2,7 +2,7 @@
 
 import logging
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -10,6 +10,7 @@ from datetime import datetime
 from core.router import QueryRouter, RoutingDecision
 from core.executor import QueryExecutor, ExecutionResult
 from models.model_specs import QueryType
+from api.middleware.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,8 @@ async def get_router_executor() -> tuple[QueryRouter, QueryExecutor]:
 
 
 @router.post("/query", response_model=QueryResponse)
-async def query_route(request: QueryRequest):
+@limiter.limit("30/minute")  # 30 queries per minute per client
+async def query_route(http_request: Request, request: QueryRequest):
     """
     Execute a single query with automatic routing.
 
@@ -148,7 +150,8 @@ async def query_route(request: QueryRequest):
 
 
 @router.post("/query/stream")
-async def query_stream_route(request: QueryRequest):
+@limiter.limit("10/minute")  # 10 streaming requests per minute per client
+async def query_stream_route(http_request: Request, request: QueryRequest):
     """
     Execute a query with streaming response.
 
@@ -221,7 +224,8 @@ async def query_stream_route(request: QueryRequest):
 
 
 @router.post("/batch", response_model=BatchResponse)
-async def batch_route(request: BatchRequest):
+@limiter.limit("10/minute")  # 10 batch requests per minute per client
+async def batch_route(http_request: Request, request: BatchRequest):
     """
     Execute multiple queries in batch.
 
